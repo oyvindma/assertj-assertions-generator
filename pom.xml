@@ -12,10 +12,10 @@
   <name>AssertJ Assertions Generator</name>
 
   <scm>
-    <developerConnection>scm:git:git@github.com:joel-costigliola/assertj-assertions-generator.git</developerConnection>
-    <connection>scm:git:git@github.com:joel-costigliola/assertj-assertions-generator.git</connection>
-    <url>git@github.com:joel-costigliola/assertj-assertions-generator</url>
-    <tag>HEAD</tag>
+<!--    <developerConnection>scm:git:git@github.com:joel-costigliola/assertj-assertions-generator.git</developerConnection>-->
+<!--    <connection>scm:git:git@github.com:joel-costigliola/assertj-assertions-generator.git</connection>-->
+<!--    <url>git@github.com:joel-costigliola/assertj-assertions-generator</url>-->
+<!--    <tag>HEAD</tag>-->
   </scm>
 
   <dependencies>
