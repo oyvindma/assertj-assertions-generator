@@ -31,7 +31,6 @@ import static org.assertj.assertions.generator.util.ClassUtil.packageOf;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Objects;
@@ -172,12 +171,12 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
   // S is used in custom_abstract_assertion_class_template.txt
   private static final String ABSTRACT_ASSERT_SELF_TYPE = "S";
 
-  // assertions classes are generated in their package directory starting from targetBaseDirectory.
-  // ex : com.nba.Player -> targetBaseDirectory/com/nba/PlayerAssert.java
-  private File targetBaseDirectory = Paths.get(".").toFile();
+
   private TemplateRegistry templateRegistry;// the pattern to search for
   private boolean generateAssertionsForAllFields = false;
   private String generatedAssertionsPackage = null;
+
+  private DefaultOutputFolderStrategy fileCreationStrategy;
 
   /**
    * Creates a new <code>{@link BaseAssertionGenerator}</code> with default templates directory.
@@ -186,6 +185,7 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
    */
   public BaseAssertionGenerator() throws IOException {
     this(TEMPLATES_DIR);
+    fileCreationStrategy = new DefaultOutputFolderStrategy();
   }
 
   /**
@@ -198,8 +198,9 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
     templateRegistry = DefaultTemplateRegistryProducer.create(templatesDirectory);
   }
 
+  @Deprecated
   public void setDirectoryWhereAssertionFilesAreGenerated(File targetBaseDirectory) {
-    this.targetBaseDirectory = targetBaseDirectory;
+    fileCreationStrategy.setTargetBaseDirectory(targetBaseDirectory);
   }
 
   public void setGenerateAssertionsForAllFields(boolean generateAssertionsForAllFields) {
@@ -223,13 +224,9 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
     // Assertion content
     String assertionFileContent = generateCustomAssertionContentFor(classDescription);
     // Create the assertion file in targetBaseDirectory + either the given package or in the class to assert package
-    String directoryWhereToCreateAssertFiles = getDirectoryWhereToCreateAssertFilesFor(classDescription);
+    String directoryWhereToCreateAssertFiles = fileCreationStrategy.getDirectoryPathCorrespondingToPackage(determinePackageName(classDescription));
     buildDirectory(directoryWhereToCreateAssertFiles);
     return createFile(assertionFileContent, classDescription.getAssertClassFilename(), directoryWhereToCreateAssertFiles);
-  }
-
-  private String getDirectoryWhereToCreateAssertFilesFor(ClassDescription classDescription) {
-    return getDirectoryPathCorrespondingToPackage(determinePackageName(classDescription));
   }
 
   @Override
@@ -238,7 +235,7 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
     // Assertion content
     String[] assertionFileContent = generateHierarchicalCustomAssertionContentFor(classDescription, allClasses);
     // Create the assertion file in targetBaseDirectory + either the given package or in the class to assert package
-    String directoryWhereToCreateAssertFiles = getDirectoryWhereToCreateAssertFilesFor(classDescription);
+    String directoryWhereToCreateAssertFiles = fileCreationStrategy.getDirectoryPathCorrespondingToPackage(determinePackageName(classDescription));
     buildDirectory(directoryWhereToCreateAssertFiles);
     // create assertion files
     File[] assertionClassFiles = new File[2];
@@ -479,7 +476,8 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
     String classPackage = isEmpty(assertionsClassPackage)
         ? determineBestEntryPointsAssertionsClassPackage(classDescriptionSet)
         : assertionsClassPackage;
-    String assertionsDirectory = getDirectoryPathCorrespondingToPackage(classPackage);
+    //FIXME targetbasedir bør komme fra fileCreationStrategy. Resten kan ligge her.
+    String assertionsDirectory = fileCreationStrategy.getDirectoryPathCorrespondingToPackage(classPackage);
     // build any needed directories
     buildDirectory(assertionsDirectory);
     return createFile(fileContent, fileName, assertionsDirectory);
@@ -522,15 +520,7 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
     return packages.first();
   }
 
-  /**
-   * Returns the target directory path where the assertions file for given classDescription will be created.
-   *
-   * @param packageName package name
-   * @return the target directory path corresponding to the given package.
-   */
-  private String getDirectoryPathCorrespondingToPackage(final String packageName) {
-    return targetBaseDirectory + File.separator + packageName.replace('.', File.separatorChar);
-  }
+
 
   private static String listNeededImports(Set<String> typesToImport, String classPackage) {
     StringBuilder imports = new StringBuilder();
