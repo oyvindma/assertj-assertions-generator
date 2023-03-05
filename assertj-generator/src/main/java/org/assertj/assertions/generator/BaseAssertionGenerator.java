@@ -314,7 +314,7 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
     // Add assertion supertype to imports if needed (for abstract assertions hierarchy)
     // we need a FQN if the parent class is in a different package than the child class, if not listNeededImports will optimize it
     final String parentAssertClassName = classesHierarchy.contains(classDescription.getSuperType())
-        ? classDescription.getFullyQualifiedParentAssertClassName()
+        ? classDescription.getFullyQualifiedParentAssertClassName(generatedAssertionsPackage)
         : "org.assertj.core.api.AbstractObjectAssert";
     if (classesHierarchy.contains(classDescription.getSuperType())) {
       classesToImport.add(parentAssertClassName);
