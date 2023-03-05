@@ -67,7 +67,7 @@ public class ClassToClassDescriptionConverterTest implements NestedClassesTest, 
     assertThat(classDescription.getFullyQualifiedAssertClassName()).isEqualTo("org.assertj.assertions.generator.data.nba.PlayerAssert");
     assertThat(classDescription.getAbstractAssertClassName()).isEqualTo("AbstractPlayerAssert");
     assertThat(classDescription.getAbstractAssertClassFilename()).isEqualTo("AbstractPlayerAssert.java");
-    assertThat(classDescription.getFullyQualifiedParentAssertClassName()).isEqualTo("org.assertj.core.api.AbstractObjectAssert");
+    assertThat(classDescription.getFullyQualifiedParentAssertClassName(null)).isEqualTo("org.assertj.core.api.AbstractObjectAssert");
   }
 
   @Test
@@ -89,7 +89,7 @@ public class ClassToClassDescriptionConverterTest implements NestedClassesTest, 
     assertThat(classDescription.getFullyQualifiedAssertClassName()).isEqualTo("org.assertj.assertions.generator.data.MovieAssert");
     assertThat(classDescription.getAbstractAssertClassName()).isEqualTo("AbstractMovieAssert");
     assertThat(classDescription.getAbstractAssertClassFilename()).isEqualTo("AbstractMovieAssert.java");
-    assertThat(classDescription.getFullyQualifiedParentAssertClassName())
+    assertThat(classDescription.getFullyQualifiedParentAssertClassName(null))
         .isEqualTo("org.assertj.assertions.generator.data.art.AbstractArtWorkAssert");
     assertThat(classDescription.implementsComparable()).as("implementsComparable ? ").isFalse();
   }
