@@ -346,6 +346,7 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
   }
 
   private String determinePackageName(ClassDescription classDescription) {
+    //TODO kandidat for API til klasse for skriving av fil.
     return generatedAssertionsPackage == null ? classDescription.getPackageName() : generatedAssertionsPackage;
   }
 
@@ -420,6 +421,7 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
   }
 
   @Override
+  //FIXME Only used by tests. Is it used by maven plugin? Concider move to testfolder.
   public File generateAssertionsEntryPointClassFor(final Set<ClassDescription> classDescriptionSet,
                                                    AssertionsEntryPointType assertionsEntryPointType,
                                                    String entryPointClassPackage) throws IOException {
@@ -461,6 +463,7 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
   }
 
   /**
+   * FIXME Only used by tests. Might be used by maven plugin? IF not move to test folder.
    * create the assertions entry point file, located in its package directory starting from targetBaseDirectory.
    * <p>
    * If assertionsClassPackage is not set, we use the common base package of the given classes, if some classe are in
