@@ -33,7 +33,8 @@ public class AssertionGeneratorOverrideTemplateTest {
 
   @Before
   public void before() throws IOException {
-    assertionGenerator = genHandle.buildAssertionGenerator();
+
+    assertionGenerator = genHandle.buildAssertionGenerator(new GeneratorConfig());
     converter = new ClassToClassDescriptionConverter();
   }
 

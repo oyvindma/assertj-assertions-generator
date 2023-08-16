@@ -87,10 +87,9 @@ public class GenerationPathHandler extends TemporaryFolder {
     };
   }
 
-  public BaseAssertionGenerator buildAssertionGenerator() throws IOException {
-    BaseAssertionGenerator assertionGenerator = new BaseAssertionGenerator();
-    assertionGenerator.setDirectoryWhereAssertionFilesAreGenerated(getRoot());
-    return assertionGenerator;
+  public BaseAssertionGenerator buildAssertionGenerator(GeneratorConfig generatorConfig) throws IOException {
+    generatorConfig.setDirectoryWhereAssertionFilesAreGenerated(getRoot());
+    return new BaseAssertionGenerator(generatorConfig);
   }
 
   public Path packagePathFor(Class<?> clazz) {

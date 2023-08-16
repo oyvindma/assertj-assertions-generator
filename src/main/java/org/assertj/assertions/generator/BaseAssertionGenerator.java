@@ -146,47 +146,20 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
   private static final String NON_PUBLIC_FIELD_VALUE_EXTRACTION = "org.assertj.core.util.introspection.FieldSupport.EXTRACTION.fieldValue(\"%s\", %s.class, actual)";
 
   private TemplateRegistry templateRegistry;// the pattern to search for
-  private boolean generateAssertionsForAllFields = false;
-  private String generatedAssertionsPackage = null;
 
   /**
    * Creates a new <code>{@link BaseAssertionGenerator}</code> with default templates directory.
    *
    * @throws IOException if some template file could not be found or read
    */
+  public BaseAssertionGenerator(GeneratorConfig config) throws IOException {
+    this.config = config;
+    templateRegistry = DefaultTemplateRegistryProducer.create(config.getTemplatesDir());
+  }
+
+
   public BaseAssertionGenerator() throws IOException {
-    this(GeneratorConfig.TEMPLATES_DIR);
-  }
-
-  /**
-   * Creates a new <code>{@link BaseAssertionGenerator}</code> with the templates from the given directory.
-   *
-   * @param templatesDirectory path where to find templates
-   * @throws IOException if some template file could not be found or read
-   */
-  public BaseAssertionGenerator(String templatesDirectory) throws IOException {
-    templateRegistry = DefaultTemplateRegistryProducer.create(templatesDirectory);
-  }
-
-  //FIXME Remove this
-  public void setDirectoryWhereAssertionFilesAreGenerated(File targetBaseDirectory) {
-    config.targetBaseDirectory = targetBaseDirectory;
-  }
-
-  public void setGenerateAssertionsForAllFields(boolean generateAssertionsForAllFields) {
-    this.generateAssertionsForAllFields = generateAssertionsForAllFields;
-  }
-
-  public void setGeneratedAssertionsPackage(String generatedAssertionsPackage) {
-    checkGivenPackageIsValid(generatedAssertionsPackage);
-    this.generatedAssertionsPackage = generatedAssertionsPackage;
-  }
-
-  private void checkGivenPackageIsValid(String generatedAssertionsPackage) {
-    Validate.isTrue(isNotBlank(generatedAssertionsPackage), "The given package '%s' must not be blank",
-                    generatedAssertionsPackage);
-    Validate.isTrue(!containsWhitespace(generatedAssertionsPackage), "The given package '%s' must not contain blank character",
-                    generatedAssertionsPackage);
+    this(new GeneratorConfig());
   }
 
   @Override
@@ -286,7 +259,7 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
     // Add assertion supertype to imports if needed (for abstract assertions hierarchy)
     // we need a FQN if the parent class is in a different package than the child class, if not listNeededImports will optimize it
     final String parentAssertClassName = classesHierarchy.contains(classDescription.getSuperType())
-        ? classDescription.getFullyQualifiedParentAssertClassName(generatedAssertionsPackage)
+        ? classDescription.getFullyQualifiedParentAssertClassName(config.getGeneratedAssertionsPackage())
         : "org.assertj.core.api.AbstractObjectAssert";
     if (classesHierarchy.contains(classDescription.getSuperType())) {
       classesToImport.add(parentAssertClassName);
@@ -318,7 +291,7 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
 
   private String determinePackageName(ClassDescription classDescription) {
     //TODO kandidat for API til klasse for skriving av fil.
-    return generatedAssertionsPackage == null ? classDescription.getPackageName() : generatedAssertionsPackage;
+    return config.getGeneratedAssertionsPackage() == null ? classDescription.getPackageName() : config.getGeneratedAssertionsPackage();
   }
 
   private String fillConcreteAssertClassTemplate(String template, ClassDescription classDescription) {
@@ -481,8 +454,8 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
   }
 
   private String determineBestEntryPointsAssertionsClassPackage(final Set<ClassDescription> classDescriptionSet) {
-    if (generatedAssertionsPackage != null) {
-      return generatedAssertionsPackage;
+    if (config.getGeneratedAssertionsPackage() != null) {
+      return config.getGeneratedAssertionsPackage();
     }
 
     SortedSet<String> packages = new TreeSet<>(ORDER_BY_INCREASING_LENGTH);
@@ -557,7 +530,7 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
   protected void generateAssertionsForFields(StringBuilder assertionsForPublicFields,
                                              Set<FieldDescription> fields, ClassDescription classDescription) {
     for (FieldDescription field : fields) {
-      if (generateAssertionsForAllFields || field.isPublic()) {
+      if (config.isGenerateAssertionsForAllFields() || field.isPublic()) {
         String assertionContent = assertionContentForField(field, classDescription);
         // assertion can be empty if we have a getter for the field
         if (!assertionContent.isEmpty()) {
@@ -606,7 +579,7 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
   }
 
   private String getTypeName(DataDescription fieldOrGetter) {
-    if (generatedAssertionsPackage != null) {
+    if (config.getGeneratedAssertionsPackage() != null) {
       // if the user has chosen to generate assertions in a given package we assume that
       return fieldOrGetter.getFullyQualifiedTypeName();
     }

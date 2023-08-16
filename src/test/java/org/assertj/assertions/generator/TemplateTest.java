@@ -12,7 +12,6 @@
  */
 package org.assertj.assertions.generator;
 
-import static org.assertj.assertions.generator.GeneratorConfig.TEMPLATES_DIR;
 import static org.assertj.assertions.generator.templates.DefaultTemplateRegistryProducer.DEFAULT_HAS_ASSERTION_TEMPLATE;
 import static org.assertj.assertions.generator.templates.Template.Type.ASSERT_CLASS;
 import static org.assertj.assertions.generator.templates.Template.Type.HAS;
@@ -27,10 +26,12 @@ import org.junit.Test;
 
 public class TemplateTest {
 
+  private GeneratorConfig generatorConfig = new GeneratorConfig();
+
   @SuppressWarnings("unused")
   @Test
   public void should_throw_an_exception_when_url_is_a_directory() {
-    URL templateURL = getClass().getClassLoader().getResource(TEMPLATES_DIR);
+    URL templateURL = getClass().getClassLoader().getResource(generatorConfig.getTemplatesDir());
     try {
       new Template(ASSERT_CLASS, templateURL);
       fail("A directory url should throw an exception");
@@ -41,14 +42,14 @@ public class TemplateTest {
 
   @Test
   public void should_create_template_from_url() {
-    URL templateURL = getClass().getClassLoader().getResource(TEMPLATES_DIR + DEFAULT_HAS_ASSERTION_TEMPLATE);
+    URL templateURL = getClass().getClassLoader().getResource(generatorConfig.getTemplatesDir() + DEFAULT_HAS_ASSERTION_TEMPLATE);
     Template template = new Template(ASSERT_CLASS, templateURL);
     assertThat(template.getContent()).isNotEmpty();
   }
 
   @Test
   public void should_create_template_from_file() {
-    File templateFile = new File(TEMPLATES_DIR, DEFAULT_HAS_ASSERTION_TEMPLATE);
+    File templateFile = new File(generatorConfig.getTemplatesDir(), DEFAULT_HAS_ASSERTION_TEMPLATE);
     Template template = new Template(HAS, templateFile);
     assertThat(template.getContent()).isNotEmpty();
   }

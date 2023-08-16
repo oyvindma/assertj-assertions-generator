@@ -55,6 +55,8 @@ public class AssertionGeneratorTest implements NestedClassesTest, BeanWithExcept
   private ClassToClassDescriptionConverter converter;
   private BaseAssertionGenerator assertionGenerator;
 
+  private  GeneratorConfig generatorConfig;
+
   @Rule
   public final GenerationPathHandler generationPathHandler = new GenerationPathHandler(AssertionGeneratorTest.class,
                                                                                        Paths.get("src/test/resources"));
@@ -62,8 +64,9 @@ public class AssertionGeneratorTest implements NestedClassesTest, BeanWithExcept
 
   @Before
   public void beforeEachTest() throws IOException {
+    generatorConfig = new GeneratorConfig();
     converter = new ClassToClassDescriptionConverter();
-    assertionGenerator = generationPathHandler.buildAssertionGenerator();
+    assertionGenerator = generationPathHandler.buildAssertionGenerator(generatorConfig);
   }
 
   @Test
@@ -74,8 +77,9 @@ public class AssertionGeneratorTest implements NestedClassesTest, BeanWithExcept
 
   @Test
   public void should_generate_assertions_in_given_package() throws Exception {
+
     String generatedAssertionPackage = "my.assertions";
-    assertionGenerator.setGeneratedAssertionsPackage(generatedAssertionPackage);
+    generatorConfig.setGeneratedAssertionsPackage(generatedAssertionPackage);
     verifyFlatAssertionGenerationFor(Player.class, generatedAssertionPackage);
     verifyHierarchicalAssertionGenerationFor(Player.class, generatedAssertionPackage);
     verifyFlatAssertionGenerationFor(PlayerAgent.class, generatedAssertionPackage);
@@ -106,7 +110,7 @@ public class AssertionGeneratorTest implements NestedClassesTest, BeanWithExcept
   @Test
   public void should_generate_assertion_for_class_with_private_fields() throws Exception {
     Set<TypeToken<?>> classesInHierarchy = setOfTypeTokens(WithPrivateFieldsParent.class);
-    assertionGenerator.setGenerateAssertionsForAllFields(true);
+    generatorConfig.setGenerateAssertionsForAllFields(true);
     verifyFlatAssertionGenerationFor(WithPrivateFields.class);
     verifyHierarchicalAssertionGenerationFor(WithPrivateFields.class, classesInHierarchy);
   }
@@ -171,7 +175,7 @@ public class AssertionGeneratorTest implements NestedClassesTest, BeanWithExcept
   public void should_generate_assertion_for_nested_class_in_given_package(NestedClass nestedClass) throws Exception {
     // GIVEN
     String generatedAssertionPackage = "my.assertions";
-    assertionGenerator.setGeneratedAssertionsPackage(generatedAssertionPackage);
+    generatorConfig.setGeneratedAssertionsPackage(generatedAssertionPackage);
     Class<?> clazz = nestedClass.nestedClass;
     // WHEN
     assertionGenerator.generateCustomAssertionFor(converter.convertToClassDescription(clazz));
@@ -299,7 +303,7 @@ public class AssertionGeneratorTest implements NestedClassesTest, BeanWithExcept
   public void should_evaluate_package_as_valid() {
     String[] validPackages = { "a", "a.b.c", "my.assertions" };
     for (int i = 0; i < validPackages.length; i++) {
-      assertionGenerator.setGeneratedAssertionsPackage(validPackages[i]);
+      generatorConfig.setGeneratedAssertionsPackage(validPackages[i]);
     }
   }
 
@@ -308,7 +312,7 @@ public class AssertionGeneratorTest implements NestedClassesTest, BeanWithExcept
     String[] invalidPackages = { "", "   ", " com.my.assertions", "com.my.assertions " };
     for (int i = 0; i < invalidPackages.length; i++) {
       try {
-        assertionGenerator.setGeneratedAssertionsPackage(invalidPackages[i]);
+        generatorConfig.setGeneratedAssertionsPackage(invalidPackages[i]);
       } catch (IllegalArgumentException e) {
         assertThat(e).hasMessageStartingWith("The given package");
         continue;

@@ -51,7 +51,7 @@ public class AssertionsEntryPointGeneratorTest {
 
   @Before
   public void beforeEachTest() throws IOException {
-    generator = genHandle.buildAssertionGenerator();
+    generator = genHandle.buildAssertionGenerator(new GeneratorConfig());
   }
 
   @Test
