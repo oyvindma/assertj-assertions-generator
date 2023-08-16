@@ -14,6 +14,7 @@ package org.assertj.assertions.generator;
 
 import org.assertj.assertions.generator.data.cars.Car;
 import org.assertj.assertions.generator.description.converter.ClassToClassDescriptionConverter;
+import org.assertj.assertions.generator.templates.Template;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

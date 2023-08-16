@@ -14,6 +14,7 @@ package org.assertj.assertions.generator;
 
 import com.google.common.reflect.TypeToken;
 import org.assertj.assertions.generator.description.ClassDescription;
+import org.assertj.assertions.generator.templates.Template;
 
 import java.io.File;
 import java.io.IOException;

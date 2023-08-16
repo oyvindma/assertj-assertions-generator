@@ -25,6 +25,7 @@ import org.assertj.assertions.generator.data.nba.Player;
 import org.assertj.assertions.generator.data.nba.team.Team;
 import org.assertj.assertions.generator.description.ClassDescription;
 import org.assertj.assertions.generator.description.converter.ClassToClassDescriptionConverter;
+import org.assertj.assertions.generator.templates.Template;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

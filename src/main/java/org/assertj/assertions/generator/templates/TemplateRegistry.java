@@ -10,7 +10,7 @@
  *
  * Copyright 2012-2021 the original author or authors.
  */
-package org.assertj.assertions.generator;
+package org.assertj.assertions.generator.templates;
 
 import java.util.HashMap;
 

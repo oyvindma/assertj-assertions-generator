@@ -13,15 +13,16 @@
 package org.assertj.assertions.generator;
 
 import static org.assertj.assertions.generator.BaseAssertionGenerator.TEMPLATES_DIR;
-import static org.assertj.assertions.generator.DefaultTemplateRegistryProducer.DEFAULT_HAS_ASSERTION_TEMPLATE;
-import static org.assertj.assertions.generator.Template.Type.ASSERT_CLASS;
-import static org.assertj.assertions.generator.Template.Type.HAS;
+import static org.assertj.assertions.generator.templates.DefaultTemplateRegistryProducer.DEFAULT_HAS_ASSERTION_TEMPLATE;
+import static org.assertj.assertions.generator.templates.Template.Type.ASSERT_CLASS;
+import static org.assertj.assertions.generator.templates.Template.Type.HAS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.io.File;
 import java.net.URL;
 
+import org.assertj.assertions.generator.templates.Template;
 import org.junit.Test;
 
 public class TemplateTest {

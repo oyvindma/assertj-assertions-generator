@@ -10,7 +10,10 @@
  *
  * Copyright 2012-2021 the original author or authors.
  */
-package org.assertj.assertions.generator;
+package org.assertj.assertions.generator.templates;
+
+import org.assertj.assertions.generator.templates.Template;
+import org.assertj.assertions.generator.templates.TemplateRegistry;
 
 import java.io.File;
 
@@ -23,7 +26,7 @@ public class DefaultTemplateRegistryProducer {
   static final String DEFAULT_IS_WRAPPER_WITHOUT_NEG_ASSERTION_TEMPLATE = "is_wrapper_without_negative_assertion_template.txt";
   static final String DEFAULT_HAS_ELEMENTS_ASSERTION_TEMPLATE_FOR_ARRAY = "has_elements_assertion_template_for_array.txt";
   static final String DEFAULT_HAS_ELEMENTS_ASSERTION_TEMPLATE_FOR_ITERABLE = "has_elements_assertion_template_for_iterable.txt";
-  static final String DEFAULT_HAS_ASSERTION_TEMPLATE = "has_assertion_template.txt";
+  public static final String DEFAULT_HAS_ASSERTION_TEMPLATE = "has_assertion_template.txt";
   static final String DEFAULT_HAS_ASSERTION_TEMPLATE_FOR_PRIMITIVE = "has_assertion_template_for_primitive.txt";
   static final String DEFAULT_HAS_ASSERTION_TEMPLATE_FOR_PRIMITIVE_WRAPPER = "has_assertion_template_for_primitive_wrapper.txt";
   static final String DEFAULT_HAS_ASSERTION_TEMPLATE_FOR_CHAR = "has_assertion_template_for_char.txt";
