@@ -57,7 +57,7 @@ import org.assertj.assertions.generator.templates.TemplateRegistry;
 
 public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEntryPointGenerator {
 
-  static final String TEMPLATES_DIR = "templates" + File.separator;
+  private GeneratorConfig config = new GeneratorConfig();
 
   private static final Comparator<String> ORDER_BY_INCREASING_LENGTH = Comparator.comparingInt(String::length);
 
@@ -145,9 +145,6 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
 
   private static final String NON_PUBLIC_FIELD_VALUE_EXTRACTION = "org.assertj.core.util.introspection.FieldSupport.EXTRACTION.fieldValue(\"%s\", %s.class, actual)";
 
-  // assertions classes are generated in their package directory starting from targetBaseDirectory.
-  // ex : com.nba.Player -> targetBaseDirectory/com/nba/PlayerAssert.java
-  private File targetBaseDirectory = Paths.get(".").toFile();
   private TemplateRegistry templateRegistry;// the pattern to search for
   private boolean generateAssertionsForAllFields = false;
   private String generatedAssertionsPackage = null;
@@ -158,7 +155,7 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
    * @throws IOException if some template file could not be found or read
    */
   public BaseAssertionGenerator() throws IOException {
-    this(TEMPLATES_DIR);
+    this(GeneratorConfig.TEMPLATES_DIR);
   }
 
   /**
@@ -171,8 +168,9 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
     templateRegistry = DefaultTemplateRegistryProducer.create(templatesDirectory);
   }
 
+  //FIXME Remove this
   public void setDirectoryWhereAssertionFilesAreGenerated(File targetBaseDirectory) {
-    this.targetBaseDirectory = targetBaseDirectory;
+    config.targetBaseDirectory = targetBaseDirectory;
   }
 
   public void setGenerateAssertionsForAllFields(boolean generateAssertionsForAllFields) {
@@ -503,7 +501,7 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
    * @return the target directory path corresponding to the given package.
    */
   private String getDirectoryPathCorrespondingToPackage(final String packageName) {
-    return targetBaseDirectory + File.separator + packageName.replace('.', File.separatorChar);
+    return config.targetBaseDirectory + File.separator + packageName.replace('.', File.separatorChar);
   }
 
   private static String listNeededImports(Set<String> typesToImport, String classPackage) {

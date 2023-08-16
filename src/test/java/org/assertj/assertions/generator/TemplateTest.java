@@ -12,7 +12,7 @@
  */
 package org.assertj.assertions.generator;
 
-import static org.assertj.assertions.generator.BaseAssertionGenerator.TEMPLATES_DIR;
+import static org.assertj.assertions.generator.GeneratorConfig.TEMPLATES_DIR;
 import static org.assertj.assertions.generator.templates.DefaultTemplateRegistryProducer.DEFAULT_HAS_ASSERTION_TEMPLATE;
 import static org.assertj.assertions.generator.templates.Template.Type.ASSERT_CLASS;
 import static org.assertj.assertions.generator.templates.Template.Type.HAS;
