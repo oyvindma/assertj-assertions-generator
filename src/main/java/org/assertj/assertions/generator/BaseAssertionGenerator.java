@@ -15,9 +15,7 @@ package org.assertj.assertions.generator;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.containsWhitespace;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.remove;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.assertj.assertions.generator.templates.Template.Type.ABSTRACT_ASSERT_CLASS;
@@ -29,9 +27,7 @@ import static org.assertj.assertions.generator.util.ClassUtil.isJavaLangType;
 import static org.assertj.assertions.generator.util.ClassUtil.packageOf;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Objects;
@@ -42,7 +38,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.assertj.assertions.generator.templates.DefaultTemplateRegistryProducer;
 import org.assertj.assertions.generator.templates.Template;
 import org.assertj.assertions.generator.templates.Template.Type;
@@ -57,7 +52,9 @@ import org.assertj.assertions.generator.templates.TemplateRegistry;
 
 public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEntryPointGenerator {
 
-  private GeneratorConfig config = new GeneratorConfig();
+  private final GeneratorConfig config;
+
+  private final FileUtil fileWriter = new FileUtil();
 
   private static final Comparator<String> ORDER_BY_INCREASING_LENGTH = Comparator.comparingInt(String::length);
 
@@ -169,7 +166,7 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
     // Create the assertion file in targetBaseDirectory + either the given package or in the class to assert package
     String directoryWhereToCreateAssertFiles = getDirectoryWhereToCreateAssertFilesFor(classDescription);
     buildDirectory(directoryWhereToCreateAssertFiles);
-    return createFile(assertionFileContent, classDescription.getAssertClassFilename(), directoryWhereToCreateAssertFiles);
+    return fileWriter.createFile(assertionFileContent, classDescription.getAssertClassFilename(), directoryWhereToCreateAssertFiles);
   }
 
   private String getDirectoryWhereToCreateAssertFilesFor(ClassDescription classDescription) {
@@ -188,8 +185,8 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
     File[] assertionClassFiles = new File[2];
     final String concreteAssertClassFileName = classDescription.getAssertClassFilename();
     final String abstractAssertClassFileName = classDescription.getAbstractAssertClassFilename();
-    assertionClassFiles[0] = createFile(assertionFileContent[0], abstractAssertClassFileName, directoryWhereToCreateAssertFiles);
-    assertionClassFiles[1] = createFile(assertionFileContent[1], concreteAssertClassFileName, directoryWhereToCreateAssertFiles);
+    assertionClassFiles[0] = fileWriter.createFile(assertionFileContent[0], abstractAssertClassFileName, directoryWhereToCreateAssertFiles);
+    assertionClassFiles[1] = fileWriter.createFile(assertionFileContent[1], concreteAssertClassFileName, directoryWhereToCreateAssertFiles);
     return assertionClassFiles;
   }
 
@@ -427,7 +424,7 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
     String assertionsDirectory = getDirectoryPathCorrespondingToPackage(classPackage);
     // build any needed directories
     buildDirectory(assertionsDirectory);
-    return createFile(fileContent, fileName, assertionsDirectory);
+    return fileWriter.createFile(fileContent, fileName, assertionsDirectory);
   }
 
   private String generateAssertionEntryPointMethodsFor(final Set<ClassDescription> classDescriptionSet,
@@ -580,6 +577,8 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
 
   private String getTypeName(DataDescription fieldOrGetter) {
     if (config.getGeneratedAssertionsPackage() != null) {
+
+      //TODO is this a bug? SHould the generatedassertionspackage be prefixed?
       // if the user has chosen to generate assertions in a given package we assume that
       return fieldOrGetter.getFullyQualifiedTypeName();
     }
@@ -742,21 +741,7 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
     return assertionContent;
   }
 
-  private void fillFile(String customAssertionContent, File assertionJavaFile) throws IOException {
-    try (FileWriter fileWriter = new FileWriter(assertionJavaFile, false)) {
-      fileWriter.write(customAssertionContent);
-    }
-  }
 
-  private File createFile(String fileContent, String fileName, String targetDirectory) throws IOException {
-    File file = new File(targetDirectory, fileName);
-
-    // Ignore the result as it only returns false when the file existed previously which is not wrong.
-    // noinspection ResultOfMethodCallIgnored
-    file.createNewFile();
-    fillFile(fileContent, file);
-    return file;
-  }
 
   private static boolean noClassDescriptionsGiven(final Set<ClassDescription> classDescriptionSet) {
     return classDescriptionSet == null || classDescriptionSet.isEmpty();
@@ -773,4 +758,6 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
     templateRegistry.register(template);
   }
 }
+
+
 
