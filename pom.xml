@@ -18,18 +18,19 @@
     <module>assertj-generator</module>
   </modules>
 
-  <scm>
+  <!--scm>
     <developerConnection>scm:git:https://github.com/assertj/assertj-generator.git</developerConnection>
     <connection>scm:git:https://github.com/assertj/assertj-generator.git</connection>
     <url>https://github.com/assertj/assertj-generator</url>
     <tag>HEAD</tag>
-  </scm>
+  </scm-->
   <issueManagement>
     <system>GitHub</system>
     <url>https://github.com/assertj/assertj-generator/issues</url>
   </issueManagement>
 
   <build>
+    <finalName>assertion-generator</finalName>
     <plugins>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
