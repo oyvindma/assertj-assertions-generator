@@ -93,13 +93,17 @@ public class AssertionGeneratorTest implements BeanWithExceptionsTest, NestedCla
   void should_generate_assertions_in_given_package() throws Exception {
     String generatedAssertionPackage = "my.assertions";
     assertionGenerator.setGeneratedAssertionsPackage(generatedAssertionPackage);
+
     verifyFlatAssertionGenerationFor(Player.class, generatedAssertionPackage);
     verifyHierarchicalAssertionGenerationFor(Player.class, generatedAssertionPackage);
     verifyFlatAssertionGenerationFor(PlayerAgent.class, generatedAssertionPackage);
     verifyHierarchicalAssertionGenerationFor(PlayerAgent.class, generatedAssertionPackage);
 
-    Set<TypeToken<?>> artClasses = setOfTypeTokens(BlockBuster.class, Movie.class, ArtWork.class);
-    verifyHierarchicalAssertionGenerationFor(BlockBuster.class, artClasses, generatedAssertionPackage);
+    verifyHierarchicalAssertionGenerationFor(
+      BlockBuster.class,
+      setOfTypeTokens(BlockBuster.class, Movie.class, ArtWork.class),
+      generatedAssertionPackage
+    );
   }
 
   @Test
@@ -380,12 +384,17 @@ public class AssertionGeneratorTest implements BeanWithExceptionsTest, NestedCla
     assertThat(actualFile).hasSameTextualContentAs(expectedFile);
   }
 
+
+
+
+
+
+
   private void verifyHierarchicalAssertionGenerationFor(Class<?> clazz) throws IOException {
     verifyHierarchicalAssertionGenerationFor(clazz, EMPTY_HIERARCHY);
   }
 
-  private void verifyHierarchicalAssertionGenerationFor(Class<?> aClass,
-                                                        Set<TypeToken<?>> typeHierarchy) throws IOException {
+  private void verifyHierarchicalAssertionGenerationFor(Class<?> aClass, Set<TypeToken<?>> typeHierarchy) throws IOException {
 
     List<File> generatedAssertFiles = newArrayList();
     Set<Class<?>> classes = toClasses(aClass, typeHierarchy);
@@ -409,24 +418,26 @@ public class AssertionGeneratorTest implements BeanWithExceptionsTest, NestedCla
   }
 
   private void verifyHierarchicalAssertionGenerationFor(Class<?> aClass,
-                                                        Set<TypeToken<?>> typeHierarchy, String generatedAssertionPackage) throws IOException {
+                                                        Set<TypeToken<?>> typeHierarchy,
+                                                        String generatedAssertionPackage) throws IOException {
 
     List<File> generatedAssertFiles = newArrayList();
-    Set<Class<?>> classes = toClasses(aClass, typeHierarchy);
-    logger.info("Generating hierarchical assertions for {}", classes);
-
-    for (Class<?> clazz : classes) {
+    for (Class<?> clazz : toClasses(aClass, typeHierarchy)) {
+      logger.info("Generating hierarchical assertion for {}", clazz);
       ClassDescription classDescription = converter.convertToClassDescription(clazz);
       generatedAssertFiles.addAll(asList(assertionGenerator.generateHierarchicalCustomAssertionFor(classDescription, typeHierarchy)));
 
       String expectedConcreteAssertFile = clazz.getSimpleName() + "Assert.generated.in.custom.package.expected.txt";
-      generationPathHandler.assertGeneratedAssertClass(clazz, expectedConcreteAssertFile, false, generatedAssertionPackage);
+      File expectedFile1 = generationHandler.getResourcesDir().resolve(expectedConcreteAssertFile).toAbsolutePath().toFile();
+      File actualFile = generationHandler.fileGeneratedFor(clazz, generatedAssertionPackage);
+      assertThat(actualFile).hasSameTextualContentAs(expectedFile1);
 
       String expectedAbstractAssertFile = "Abstract" + clazz.getSimpleName() + "Assert.generated.in.custom.package.expected.txt";
-      generationPathHandler.assertAbstractGeneratedAssertClass(clazz, expectedAbstractAssertFile, generatedAssertionPackage);
-    }
+      File expectedFile = generationHandler.getResourcesDir().resolve(expectedAbstractAssertFile).toAbsolutePath().toFile();
+      assertThat(generationHandler.abstractFileGeneratedFor(clazz, generatedAssertionPackage)).hasSameTextualContentAs(expectedFile);
 
-    generationPathHandler.compileGeneratedFiles(generatedAssertFiles);
+    }
+    generationHandler.compileGeneratedFiles(generatedAssertFiles);
   }
 
   private void verifyHierarchicalAssertionGenerationFor(Class<?> aClass, String generatedAssertionPackage) throws IOException {
