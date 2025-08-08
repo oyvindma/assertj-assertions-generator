@@ -633,6 +633,7 @@ public class BaseAssertionGenerator implements AssertionGenerator, AssertionsEnt
   }
 
   private String getTypeName(DataDescription fieldOrGetter) {
+
     if (generatedAssertionsPackage != null) {
       // if the user has chosen to generate assertions in a given package we assume that
       return fieldOrGetter.getFullyQualifiedTypeName();
