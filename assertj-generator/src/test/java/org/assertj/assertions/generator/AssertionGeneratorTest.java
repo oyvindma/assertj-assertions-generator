@@ -93,11 +93,28 @@ public class AssertionGeneratorTest implements BeanWithExceptionsTest, NestedCla
   }
 
   @Test
-  void should_generate_assertions_with_correct_use_of_import_and_fully_qualified_type_names() throws Exception {
-    String generatedAssertionPackage = "my.assertions";
-    assertionGenerator.setGeneratedAssertionsPackage(generatedAssertionPackage);
+  void should_generate_flat_assertions_for_OwningClass() throws Exception {
+//    String generatedAssertionPackage = "my.assertions";
+//    assertionGenerator.setGeneratedAssertionsPackage(generatedAssertionPackage);
 
-    verifyFlatAssertionGenerationFor(OwningClass.class, generatedAssertionPackage);
+    verifyFlatAssertionGenerationFor(OwningClass.class);
+
+  }
+
+  @Test
+  void should_generate_flat_assertions_for_InheritingOwningClassFromSamePackage() throws Exception {
+//    String generatedAssertionPackage = "my.assertions";
+//    assertionGenerator.setGeneratedAssertionsPackage(generatedAssertionPackage);
+
+    verifyFlatAssertionGenerationFor(InheritingOwningClassFromSamePackage.class);
+  }
+
+  @Test
+  void should_generate_assertions_with_correct_use_of_import_and_fully_qualified_type_names() throws Exception {
+//    String generatedAssertionPackage = "my.assertions";
+//    assertionGenerator.setGeneratedAssertionsPackage(generatedAssertionPackage);
+
+    verifyFlatAssertionGenerationFor(OwningClass.class);
 
 //    verifyFlatAssertionGenerationFor(InheritingOwningClassFromSamePackage.class, generatedAssertionPackage);
 //
