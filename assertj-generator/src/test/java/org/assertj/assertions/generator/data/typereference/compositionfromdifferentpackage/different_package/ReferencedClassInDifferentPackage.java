@@ -10,12 +10,18 @@
  *
  * Copyright 2012-2025 the original author or authors.
  */
-package org.assertj.assertions.generator.data.typereference;
+package org.assertj.assertions.generator.data.typereference.compositionfromdifferentpackage.different_package;
 
+public class ReferencedClassInDifferentPackage {
 
-import java.sql.Timestamp;
+  private String stedNavn;
 
-public class KlassInSamePackage {
-    private long id;
-    private Timestamp endretTidspunkt;
+  public String getStedNavn() {
+    return stedNavn;
+  }
+
+  public void setStedNavn(String stedNavn) {
+    this.stedNavn = stedNavn;
+  }
+
 }

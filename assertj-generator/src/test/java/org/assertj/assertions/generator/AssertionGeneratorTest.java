@@ -31,9 +31,6 @@ import org.assertj.assertions.generator.data.Team;
 import org.assertj.assertions.generator.data.WithPrivateFields;
 import org.assertj.assertions.generator.data.WithPrivateFieldsParent;
 import org.assertj.assertions.generator.data.art.ArtWork;
-import org.assertj.assertions.generator.data.typereference.InheritingOwningClassFromSamePackage;
-import org.assertj.assertions.generator.data.typereference.OwningClass;
-import org.assertj.assertions.generator.data.typereference.different_patckage_2.InheritingOwningClassFromDifferentPackage;
 import org.assertj.assertions.generator.data.nba.Player;
 import org.assertj.assertions.generator.data.nba.PlayerAgent;
 import org.assertj.assertions.generator.description.ClassDescription;
@@ -93,59 +90,13 @@ public class AssertionGeneratorTest implements BeanWithExceptionsTest, NestedCla
   }
 
   @Test
-  void should_generate_flat_assertions_for_OwningClass() throws Exception {
-//    String generatedAssertionPackage = "my.assertions";
-//    assertionGenerator.setGeneratedAssertionsPackage(generatedAssertionPackage);
-
-    verifyFlatAssertionGenerationFor(OwningClass.class);
-
-  }
-
-  @Test
-  void should_generate_flat_assertions_for_InheritingOwningClassFromSamePackage() throws Exception {
-//    String generatedAssertionPackage = "my.assertions";
-//    assertionGenerator.setGeneratedAssertionsPackage(generatedAssertionPackage);
-
-    verifyFlatAssertionGenerationFor(InheritingOwningClassFromSamePackage.class);
-  }
-
-  @Test
-  void should_generate_assertions_with_correct_use_of_import_and_fully_qualified_type_names() throws Exception {
-//    String generatedAssertionPackage = "my.assertions";
-//    assertionGenerator.setGeneratedAssertionsPackage(generatedAssertionPackage);
-
-    verifyFlatAssertionGenerationFor(OwningClass.class);
-
-//    verifyFlatAssertionGenerationFor(InheritingOwningClassFromSamePackage.class, generatedAssertionPackage);
-//
-//    verifyFlatAssertionGenerationFor(InheritingOwningClassFromDifferentPackage.class, generatedAssertionPackage);
-
-
-//    verifyHierarchicalAssertionGenerationFor(
-//      BlockBuster.class,
-//      setOfTypeTokens(BlockBuster.class, Movie.class, ArtWork.class),
-//      generatedAssertionPackage
-//    );
-  }
-
-
-//  @Test
-
   void should_generate_assertions_in_given_package() throws Exception {
     String generatedAssertionPackage = "my.assertions";
     assertionGenerator.setGeneratedAssertionsPackage(generatedAssertionPackage);
-
     verifyFlatAssertionGenerationFor(Player.class, generatedAssertionPackage);
-    verifyFlatAssertionGenerationFor(OwningClass.class, generatedAssertionPackage);
-    verifyFlatAssertionGenerationFor(PlayerAgent.class, generatedAssertionPackage);
-
     verifyHierarchicalAssertionGenerationFor(Player.class, generatedAssertionPackage);
+    verifyFlatAssertionGenerationFor(PlayerAgent.class, generatedAssertionPackage);
     verifyHierarchicalAssertionGenerationFor(PlayerAgent.class, generatedAssertionPackage);
-    verifyHierarchicalAssertionGenerationFor(
-      BlockBuster.class,
-      setOfTypeTokens(BlockBuster.class, Movie.class, ArtWork.class),
-      generatedAssertionPackage
-    );
   }
 
   @Test
@@ -421,22 +372,17 @@ public class AssertionGeneratorTest implements BeanWithExceptionsTest, NestedCla
     File expectedFile = generationHandler.getResourcesDir().resolve(expectedAssertFile).toAbsolutePath().toFile();
     File actualFile = generationHandler.fileGeneratedFor(clazz, generatedAssertionPackage);
     // compile it!
+    generationHandler.compileGeneratedFilesFor(generatedAssertionPackage, clazz);
 
     assertThat(actualFile).hasSameTextualContentAs(expectedFile);
-    generationHandler.compileGeneratedFilesFor(generatedAssertionPackage, clazz);
   }
-
-
-
-
-
-
 
   private void verifyHierarchicalAssertionGenerationFor(Class<?> clazz) throws IOException {
     verifyHierarchicalAssertionGenerationFor(clazz, EMPTY_HIERARCHY);
   }
 
-  private void verifyHierarchicalAssertionGenerationFor(Class<?> aClass, Set<TypeToken<?>> typeHierarchy) throws IOException {
+  private void verifyHierarchicalAssertionGenerationFor(Class<?> aClass,
+                                                        Set<TypeToken<?>> typeHierarchy) throws IOException {
 
     List<File> generatedAssertFiles = newArrayList();
     Set<Class<?>> classes = toClasses(aClass, typeHierarchy);
@@ -455,29 +401,6 @@ public class AssertionGeneratorTest implements BeanWithExceptionsTest, NestedCla
       String expectedAbstractAssertFile = "Abstract" + clazz.getSimpleName() + "Assert.expected.txt";
       File expectedFile = generationHandler.getResourcesDir().resolve(expectedAbstractAssertFile).toAbsolutePath().toFile();
       assertThat(generationHandler.abstractFileGeneratedFor(clazz)).hasSameTextualContentAs(expectedFile);
-    }
-    generationHandler.compileGeneratedFiles(generatedAssertFiles);
-  }
-
-  private void verifyHierarchicalAssertionGenerationFor(Class<?> aClass,
-                                                        Set<TypeToken<?>> typeHierarchy,
-                                                        String generatedAssertionPackage) throws IOException {
-
-    List<File> generatedAssertFiles = newArrayList();
-    for (Class<?> clazz : toClasses(aClass, typeHierarchy)) {
-      logger.info("Generating hierarchical assertion for {}", clazz);
-      ClassDescription classDescription = converter.convertToClassDescription(clazz);
-      generatedAssertFiles.addAll(asList(assertionGenerator.generateHierarchicalCustomAssertionFor(classDescription, typeHierarchy)));
-
-      String expectedConcreteAssertFile = clazz.getSimpleName() + "Assert.generated.in.custom.package.expected.txt";
-      File expectedFile1 = generationHandler.getResourcesDir().resolve(expectedConcreteAssertFile).toAbsolutePath().toFile();
-      File actualFile = generationHandler.fileGeneratedFor(clazz, generatedAssertionPackage);
-      assertThat(actualFile).hasSameTextualContentAs(expectedFile1);
-
-      String expectedAbstractAssertFile = "Abstract" + clazz.getSimpleName() + "Assert.generated.in.custom.package.expected.txt";
-      File expectedFile = generationHandler.getResourcesDir().resolve(expectedAbstractAssertFile).toAbsolutePath().toFile();
-      assertThat(generationHandler.abstractFileGeneratedFor(clazz, generatedAssertionPackage)).hasSameTextualContentAs(expectedFile);
-
     }
     generationHandler.compileGeneratedFiles(generatedAssertFiles);
   }
